@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --color-alabaster: #FAF9F6;
+  --color-stone-soft: #F3F1EC;
+  --color-espresso: #1C1B18;
+  --color-slate-warm: #6B6860;
+  --color-bronze: #8C5E3C;
+  --color-bronze-hover: #734B2E;
+  --color-border-warm: #E8E5DF;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+  background-color: #FAF9F6;
+  color: #1C1B18;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
