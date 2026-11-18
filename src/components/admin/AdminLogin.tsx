@@ -11,8 +11,8 @@ export function AdminLogin({
   onSuccess: (session: SessionStatus) => void;
 }) {
   const { t } = useLanguage();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('sgdcjuniorskz6@gmail.com');
+  const [password, setPassword] = useState('AdminPassword2026!');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +69,10 @@ export function AdminLogin({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs leading-relaxed text-emerald-950">
+              <span className="font-semibold text-emerald-900">Supabase подключен:</span> Учётная запись администратора заполнена. Нажмите «{t.admin.signIn}» для входа и управления записями из публичной БД.
+            </div>
+
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[#1C1B18]">
                 {t.admin.email}
