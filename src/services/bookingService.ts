@@ -18,6 +18,7 @@ import type {
   PublicBookingInput,
   SalonSettings,
   Service,
+  TelegramSettings,
   TimeInterval,
 } from '../types/booking';
 
@@ -713,6 +714,86 @@ export const bookingService = {
       .single();
     if (error) throw error;
     return data as SalonSettings;
+  },
+
+  async getTelegramSettings(): Promise<TelegramSettings> {
+    const defaultTg: TelegramSettings = {
+      id: 1,
+      bot_token: null,
+      chat_id: null,
+      is_enabled: false,
+      send_on_new: true,
+      send_on_cancel: true,
+    };
+
+    if (!supabase) return defaultTg;
+
+    const { data, error } = await supabase
+      .from('telegram_settings')
+      .select('*')
+      .eq('id', 1)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('Error fetching telegram settings:', error.message);
+      return defaultTg;
+    }
+    return (data as TelegramSettings | null) ?? defaultTg;
+  },
+
+  async saveTelegramSettings(settings: Partial<TelegramSettings>): Promise<TelegramSettings> {
+    const payload = {
+      id: 1,
+      bot_token: settings.bot_token ? settings.bot_token.trim() : null,
+      chat_id: settings.chat_id ? settings.chat_id.trim() : null,
+      is_enabled: Boolean(settings.is_enabled),
+      send_on_new: settings.send_on_new ?? true,
+      send_on_cancel: settings.send_on_cancel ?? true,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (!supabase) return payload as TelegramSettings;
+
+    const { data, error } = await supabase
+      .from('telegram_settings')
+      .upsert(payload, { onConflict: 'id' })
+      .select('*')
+      .single();
+
+    if (error) throw error;
+    return data as TelegramSettings;
+  },
+
+  async testTelegramNotification(botToken: string, chatId: string): Promise<{ success: boolean }> {
+    const token = botToken.trim();
+    const chat = chatId.trim();
+    if (!token || !chat) {
+      throw new Error('Укажите токен бота и chat ID для проверки');
+    }
+
+    const text =
+      '✅ <b>LINEA Hair Studio: Тестовое уведомление</b>\n\n' +
+      'Уведомления в Telegram успешно настроены и работают!\n' +
+      'Теперь каждая новая запись на сайте будет мгновенно приходить в этот чат.';
+
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chat,
+        text,
+        parse_mode: 'HTML',
+      }),
+    });
+
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok || !body.ok) {
+      const desc = body.description || `HTTP ${res.status}`;
+      throw new Error(`Ошибка Telegram: ${desc}`);
+    }
+
+    return { success: true };
   },
 };
 

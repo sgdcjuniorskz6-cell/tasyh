@@ -123,3 +123,12 @@ export interface BookingConfirmation {
   status: AppointmentStatus;
 }
 
+export interface TelegramSettings {
+  id: number;
+  bot_token: string | null;
+  chat_id: string | null;
+  is_enabled: boolean;
+  send_on_new?: boolean;
+  send_on_cancel?: boolean;
+}
+
